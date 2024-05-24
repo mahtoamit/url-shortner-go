@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.0/css/boxicons.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+        }
+        .form-container label {
+            font-weight: bold;
+        }
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .result-container input[type="text"] {
+            width: calc(100% - 50px);
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            float: left;
+        }
+        .result-container button {
+            float: right;
+            padding: 10px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .result-container .share-btns {
+            clear: both;
+            margin-top: 10px;
+        }
+        .result-container .share-btns a {
+            margin-right: 5px;
+            text-decoration: none;
+            color: #555;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <div class="form-container">
+        <label for="url">Enter URL:</label>
+        <input type="text" id="url" name="url" placeholder="Enter your long URL">
+        <button onclick="shortenUrl()">Shorten URL</button>
+    </div>
+    <div class="result-container">
+        <input type="text" id="shortenedUrl" readonly>
+        <button onclick="copyToClipboard()">Copy</button>
+        <div class="share-btns">
+            <a href="#" onclick="shareToWhatsapp()"><i class='bx bxl-whatsapp'></i></a>
+            <a href="#" onclick="shareToInstagram()"><i class='bx bxl-instagram'></i></a>
+            <a href="#" onclick="shareToLinkedIn()"><i class='bx bxl-linkedin'></i></a>
+            <a href="#" onclick="shareToTwitter()"><i class='bx bxl-twitter'></i></a>
+            <a href="#" onclick="shareToFacebook()"><i class='bx bxl-facebook'></i></a>
+        </div>
+    </div>
+
+    <script>
+        function shortenUrl() {
+            var url = document.getElementById("url").value;
+
+            fetch('/shorten', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("shortenedUrl").value = data.shortened_url;
+                document.querySelector(".result-container").style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function copyToClipboard() {
+            var copyText = document.getElementById("shortenedUrl");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+            document.execCommand("copy");
+            alert("Copied the shortened URL: " + copyText.value);
+        }
+
+        function shareToWhatsapp() {
+            var shortenedUrl = document.getElementById("shortenedUrl").value;
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shortenedUrl), '_blank');
+        }
+
+        function shareToInstagram() {
+            var shortenedUrl = document.getElementById("shortenedUrl").value;
+            window.open('https://www.instagram.com/share?url=' + encodeURIComponent(shortenedUrl), '_blank');
+        }
+
+        function shareToLinkedIn() {
+            var shortenedUrl = document.getElementById("shortenedUrl").value;
+            window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shortenedUrl), '_blank');
+        }
+
+        function shareToTwitter() {
+            var shortenedUrl = document.getElementById("shortenedUrl").value;
+            window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shortenedUrl), '_blank');
+        }
+
+        function shareToFacebook() {
+            var shortenedUrl = document.getElementById("shortenedUrl").value;
+            window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shortenedUrl), '_blank');
+        }
+    </script>
+</body>
+</html>
